@@ -56,16 +56,9 @@
     };
 
     /* Starting data for newly created accounts */
-    const NEW_ACCOUNT_CHECKING = 12840.5;
-    const NEW_ACCOUNT_SAVINGS = 5420;
+    const NEW_ACCOUNT_CHECKING = 10000;
+    const NEW_ACCOUNT_SAVINGS = 0;
 
-    const DEFAULT_TRANSACTIONS = [
-        { description: "Salary Deposit",   date: "Aug 28, 2026", amount: 4200,    type: "income",  status: "Completed" },
-        { description: "Grocery Market",   date: "Aug 27, 2026", amount: -86.42,  type: "expense", status: "Completed" },
-        { description: "Electricity Bill", date: "Aug 25, 2026", amount: -145,    type: "expense", status: "Completed" },
-        { description: "Online Transfer",  date: "Aug 23, 2026", amount: -250,    type: "expense", status: "Completed" },
-        { description: "Coffee Shop",      date: "Aug 21, 2026", amount: -12.5,   type: "expense", status: "Completed" }
-    ];
 
 
     /* =====================================================
@@ -267,7 +260,13 @@
     }
 
     function createStartingTransactions() {
-        return DEFAULT_TRANSACTIONS.map(transaction => ({ ...transaction }));
+        return [{
+            description: "Opening Balance",
+            date: getTodayShort(),
+            amount: NEW_ACCOUNT_CHECKING,
+            type: "income",
+            status: "Completed"
+        }];
     }
 
 
@@ -1035,7 +1034,15 @@
                 date: getTodayShort(),
                 amount,
                 type: "income",
-                status: "Completed"
+                status: "Completed",
+                receipt: {
+                    ...receipt,
+                    direction: "in",
+                    recipient: target.name,
+                    toLabel: `${match.kind === "checking" ? "Checking" : "Savings"} •••• ${last4(target[match.kind === "checking" ? "checkingNumber" : "savingsNumber"])}`,
+                    fee: 0,
+                    total: amount
+                }
             }, ...(target.transactions || [])].slice(0, MAX_TRANSACTIONS);
         }
 
@@ -1159,7 +1166,8 @@
         const row = (label, value) => `<div class="receipt-row"><span>${label}</span><strong>${value}</strong></div>`;
 
         const failed = r.status === "Failed";
-        const heading = failed ? "Transfer failed" : r.status === "Completed" ? "Transfer completed" : "Transfer submitted";
+        const incoming = r.direction === "in";
+        const heading = incoming ? "Payment received" : failed ? "Transfer failed" : r.status === "Completed" ? "Transfer completed" : "Transfer submitted";
         const icon = failed ? "fa-circle-xmark" : r.status === "Completed" ? "fa-circle-check" : "fa-clock";
 
         receiptOverlay.innerHTML = `
@@ -1176,15 +1184,15 @@
                     ${row("Date &amp; time", esc(when))}
                     ${row("Transfer type", esc(r.typeLabel))}
                     ${row("From", `${esc(r.senderName)} · ${esc(r.fromLabel)}`)}
-                    ${row("To", esc(r.recipient))}
-                    ${row("Recipient account", `${esc(r.accountType)} •••• ${esc(r.accountLast4)}`)}
+                    ${row("To", incoming ? `${esc(r.recipient)} · ${esc(r.toLabel)}` : esc(r.recipient))}
+                    ${incoming ? "" : row("Recipient account", `${esc(r.accountType)} •••• ${esc(r.accountLast4)}`)}
                     ${row("Routing number", esc(r.routing))}
                     ${r.memo ? row("Memo", esc(r.memo)) : ""}
                     ${row("Estimated arrival", esc(r.eta))}
                     ${r.failureReason ? row("Reason", esc(r.failureReason)) : ""}
                     ${row("Amount", formatCurrency(r.amount))}
                     ${row("Fee", formatCurrency(r.fee))}
-                    <div class="receipt-row receipt-total"><span>Total debited</span><strong>${formatCurrency(r.total)}</strong></div>
+                    <div class="receipt-row receipt-total"><span>${incoming ? "Amount received" : "Total debited"}</span><strong>${formatCurrency(r.total)}</strong></div>
                 </div>
                 <p class="receipt-note">${failed ? "This transfer was not completed. The full amount, including any fee, has been returned to your checking account." : "Keep this receipt for your records. Contact support promptly if you did not authorize this transfer."}</p>
                 <div class="receipt-actions">
