@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>NexaBank Support Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        background: var(--gray-50);
+      }
+      .gate {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+      .gate-card {
+        width: min(400px, 100%);
+        padding: 32px;
+        background: var(--white);
+        border-radius: 18px;
+        box-shadow: var(--shadow-lg);
+      }
+      .gate-card h1 {
+        font-size: 22px;
+        color: var(--navy-950);
+        margin: 14px 0 4px;
+      }
+      .gate-card p {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .console {
+        display: none;
+        height: 100vh;
+        height: 100dvh;
+        grid-template-columns: 330px 1fr;
+      }
+      .console.active {
+        display: grid;
+      }
+      .side {
+        display: flex;
+        flex-direction: column;
+        background: var(--white);
+        border-right: 1px solid var(--border);
+        min-height: 0;
+      }
+      .side-head {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+      .side-head select {
+        height: 34px;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 0 8px;
+        font-size: 13px;
+      }
+      .list {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .item {
+        width: 100%;
+        text-align: left;
+        border: 0;
+        border-bottom: 1px solid var(--gray-100);
+        background: var(--white);
+        padding: 13px 16px;
+        display: block;
+      }
+      .item:hover,
+      .item.sel {
+        background: var(--gray-50);
+      }
+      .item .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--navy-900);
+      }
+      .item .meta {
+        font-size: 11px;
+        color: var(--emerald-dark);
+        font-weight: 700;
+        margin: 2px 0;
+      }
+      .item .prev {
+        font-size: 12px;
+        color: var(--gray-500);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--danger);
+        margin-right: 6px;
+      }
+      .pane {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+      }
+      .pane-head {
+        padding: 14px 20px;
+        background: var(--white);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+      .pane-head strong {
+        color: var(--navy-950);
+      }
+      .pane-head small {
+        display: block;
+        color: var(--gray-500);
+        font-size: 12px;
+      }
+      .msgs {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .msg {
+        max-width: 70%;
+        padding: 9px 13px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.45;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+      .msg small {
+        display: block;
+        margin-top: 3px;
+        font-size: 10px;
+        opacity: 0.7;
+      }
+      .msg.user {
+        align-self: flex-start;
+        background: var(--white);
+        border: 1px solid var(--border);
+      }
+      .msg.agent {
+        align-self: flex-end;
+        background: var(--emerald-dark);
+        color: var(--white);
+      }
+      .empty {
+        margin: auto;
+        color: var(--gray-500);
+        font-size: 14px;
+        text-align: center;
+        padding: 20px;
+      }
+      .reply {
+        display: flex;
+        gap: 10px;
+        padding: 14px 20px;
+        background: var(--white);
+        border-top: 1px solid var(--border);
+      }
+      .reply input {
+        flex: 1;
+        min-width: 0;
+        height: 44px;
+        padding: 0 14px;
+        border: 1px solid var(--gray-200);
+        border-radius: 9px;
+        font-size: 14px;
+        outline: none;
+      }
+      .reply input:focus {
+        border-color: var(--emerald);
+      }
+      .btn.sm {
+        padding: 8px 14px;
+        font-size: 13px;
+      }
+      @media (max-width: 760px) {
+        .console.active {
+          grid-template-columns: 1fr;
+          grid-template-rows: 40% 60%;
+        }
+        .side {
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .msg {
+          max-width: 88%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Passcode gate -->
+    <div class="gate" id="gate">
+      <form class="gate-card" id="gateForm">
+        <span class="logo-icon"><i class="fa-solid fa-headset"></i></span>
+        <h1 id="gateTitle">Support console</h1>
+        <p id="gateText"></p>
+        <div class="form-group">
+          <label for="gatePass">Passcode</label>
+          <div class="input-wrapper plain">
+            <input
+              type="password"
+              id="gatePass"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+        </div>
+        <div class="form-group" id="gateConfirmWrap" hidden>
+          <label for="gatePass2">Confirm passcode</label>
+          <div class="input-wrapper plain">
+            <input type="password" id="gatePass2" autocomplete="new-password" />
+          </div>
+        </div>
+        <button class="btn btn-primary modal-submit" type="submit">
+          Continue
+        </button>
+        <div class="form-message" id="gateMsg" role="alert"></div>
+      </form>
+    </div>
+
+    <!-- Console -->
+    <div class="console" id="console">
+      <aside class="side">
+        <div class="side-head">
+          <strong>Conversations</strong>
+          <select id="filter" aria-label="Filter">
+            <option value="all">All</option>
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="list" id="list"></div>
+        <div class="side-head">
+          <button class="btn btn-outline sm" id="lock">Lock console</button>
+        </div>
+      </aside>
+
+      <section class="pane">
+        <div class="pane-head" id="paneHead" hidden>
+          <div><strong id="who"></strong><small id="info"></small></div>
+          <button class="btn btn-outline sm" id="toggle"></button>
+        </div>
+        <div class="msgs" id="msgs">
+          <p class="empty">Select a conversation to read and reply.</p>
+        </div>
+        <form class="reply" id="reply" hidden>
+          <input
+            id="replyInput"
+            maxlength="1000"
+            placeholder="Type your reply…"
+            autocomplete="off"
+          />
+          <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+
+    <script>
+      (() => {
+        "use strict";
+
+        const SUPPORT_KEY = "nexaBankSupport";
+        const PASS_KEY = "nexaBankAgentPass";
+        const SESSION_KEY = "nexaAgentSession";
+        const $ = (id) => document.getElementById(id);
+
+        let selectedId = null;
+
+        /* ---------- storage ---------- */
+        const getTickets = () => {
+          try {
+            const t = JSON.parse(localStorage.getItem(SUPPORT_KEY));
+            return Array.isArray(t) ? t : [];
+          } catch (e) {
+            return [];
+          }
+        };
+        const saveTickets = (t) =>
+          localStorage.setItem(SUPPORT_KEY, JSON.stringify(t));
+
+        async function sha256(text) {
+          if (!crypto.subtle) return `plain:${text}`;
+          const digest = await crypto.subtle.digest(
+            "SHA-256",
+            new TextEncoder().encode(`nexa-agent:${text}`),
+          );
+          return Array.from(new Uint8Array(digest), (b) =>
+            b.toString(16).padStart(2, "0"),
+          ).join("");
+        }
+
+        const el = (tag, cls, text) => {
+          const node = document.createElement(tag);
+          if (cls) node.className = cls;
+          if (text !== undefined) node.textContent = text;
+          return node;
+        };
+        const fmt = (at) =>
+          new Date(at).toLocaleString([], {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+          });
+
+        /* ---------- passcode gate ---------- */
+        function setupGate() {
+          const firstTime = !localStorage.getItem(PASS_KEY);
+          $("gateTitle").textContent = firstTime
+            ? "Create agent passcode"
+            : "Support console";
+          $("gateText").textContent = firstTime
+            ? "Set a passcode (8+ characters) to protect this console."
+            : "Enter your agent passcode to continue.";
+          $("gateConfirmWrap").hidden = !firstTime;
+          $("gatePass2").required = firstTime;
+
+          if (sessionStorage.getItem(SESSION_KEY) === "1" && !firstTime)
+            openConsole();
+        }
+
+        $("gateForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const msg = $("gateMsg");
+          const pass = $("gatePass").value;
+          const stored = localStorage.getItem(PASS_KEY);
+
+          msg.className = "form-message error";
+
+          if (!stored) {
+            if (pass.length < 8) {
+              msg.textContent = "Passcode must be at least 8 characters.";
+              return;
+            }
+            if (pass !== $("gatePass2").value) {
+              msg.textContent = "Passcodes do not match.";
+              return;
+            }
+            localStorage.setItem(PASS_KEY, await sha256(pass));
+          } else if ((await sha256(pass)) !== stored) {
+            msg.textContent = "Incorrect passcode.";
+            return;
+          }
+
+          sessionStorage.setItem(SESSION_KEY, "1");
+          $("gateForm").reset();
+          msg.textContent = "";
+          openConsole();
+        });
+
+        function openConsole() {
+          $("gate").style.display = "none";
+          $("console").classList.add("active");
+          renderList();
+        }
+
+        $("lock").addEventListener("click", () => {
+          sessionStorage.removeItem(SESSION_KEY);
+          location.reload();
+        });
+
+        /* ---------- conversation list ---------- */
+        function renderList() {
+          const filter = $("filter").value;
+          const list = $("list");
+          list.replaceChildren();
+
+          const tickets = getTickets()
+            .filter((t) => filter === "all" || t.status === filter)
+            .sort((a, b) => b.updatedAt - a.updatedAt);
+
+          if (!tickets.length) {
+            list.append(el("p", "empty", "No conversations yet."));
+          }
+
+          tickets.forEach((t) => {
+            const last = t.messages[t.messages.length - 1];
+            const item = el(
+              "button",
+              `item${t.id === selectedId ? " sel" : ""}`,
+            );
+            item.type = "button";
+
+            const top = el("div", "top");
+            const name = el("span");
+            if (t.unreadAgent) name.append(el("span", "dot"));
+            name.append(document.createTextNode(t.userName));
+            top.append(name, el("span", "", fmt(t.updatedAt)));
+
+            item.append(
+              top,
+              el("div", "meta", `${t.id} · ${t.category} · ${t.status}`),
+              el("div", "prev", last ? last.text : ""),
+            );
+            item.addEventListener("click", () => select(t.id));
+            list.append(item);
+          });
+
+          if (selectedId) renderThread();
+        }
+
+        /* ---------- thread ---------- */
+        function select(id) {
+          selectedId = id;
+          const tickets = getTickets();
+          const t = tickets.find((x) => x.id === id);
+
+          if (t && t.unreadAgent) {
+            t.unreadAgent = false;
+            saveTickets(tickets);
+          }
+          renderList();
+          $("replyInput").focus();
+        }
+
+        function renderThread() {
+          const t = getTickets().find((x) => x.id === selectedId);
+          if (!t) return;
+
+          $("paneHead").hidden = false;
+          $("who").textContent = t.userName;
+          $("info").textContent =
+            `${t.userEmail} · ${t.id} · ${t.category} · opened ${fmt(t.createdAt)}`;
+          $("toggle").textContent =
+            t.status === "open" ? "Close conversation" : "Reopen";
+          $("reply").hidden = t.status !== "open";
+
+          const box = $("msgs");
+          box.replaceChildren();
+
+          t.messages.forEach((m) => {
+            const bubble = el("div", `msg ${m.from}`, m.text);
+            bubble.append(
+              el(
+                "small",
+                "",
+                `${m.from === "agent" ? "You" : t.userName} · ${fmt(m.at)}`,
+              ),
+            );
+            box.append(bubble);
+          });
+
+          if (t.status !== "open")
+            box.append(el("p", "empty", "This conversation is closed."));
+          box.scrollTop = box.scrollHeight;
+        }
+
+        $("reply").addEventListener("submit", (event) => {
+          event.preventDefault();
+          const text = $("replyInput").value.trim();
+          if (!text || !selectedId) return;
+
+          const tickets = getTickets();
+          const t = tickets.find((x) => x.id === selectedId);
+          if (!t || t.status !== "open") return;
+
+          const now = Date.now();
+          t.messages.push({ from: "agent", text, at: now });
+          t.updatedAt = now;
+          t.unreadUser = true;
+          saveTickets(tickets);
+
+          $("replyInput").value = "";
+          renderList();
+        });
+
+        $("toggle").addEventListener("click", () => {
+          const tickets = getTickets();
+          const t = tickets.find((x) => x.id === selectedId);
+          if (!t) return;
+
+          t.status = t.status === "open" ? "closed" : "open";
+          t.updatedAt = Date.now();
+          t.unreadUser = true;
+          saveTickets(tickets);
+          renderList();
+        });
+
+        $("filter").addEventListener("change", renderList);
+
+        /* New messages from customers (other tabs) */
+        window.addEventListener("storage", (event) => {
+          if (
+            event.key === SUPPORT_KEY &&
+            $("console").classList.contains("active")
+          )
+            renderList();
+        });
+
+        setupGate();
+      })();
+    </script>
+  </body>
+</html>
