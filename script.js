@@ -1,5 +1,5 @@
 /* =========================================================
-   UnitedBank - FRONT-END DEMO BANKING APPLICATION
+   UnitedBANK - FRONT-END DEMO BANKING APPLICATION
    ---------------------------------------------------------
    Sections:
    1.  Config & constants
@@ -56,7 +56,7 @@
     };
 
     /* Starting data for newly created accounts */
-    const NEW_ACCOUNT_CHECKING = 10000;
+    const NEW_ACCOUNT_CHECKING = 60000;
     const NEW_ACCOUNT_SAVINGS = 0;
 
 
