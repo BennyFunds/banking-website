@@ -1,5 +1,5 @@
 /* =========================================================
-   NEXABANK - FRONT-END DEMO BANKING APPLICATION
+   UnitedBank - FRONT-END DEMO BANKING APPLICATION
    ---------------------------------------------------------
    Sections:
    1.  Config & constants
@@ -31,9 +31,9 @@
     ===================================================== */
 
     const STORAGE_KEYS = {
-        users: "nexaBankUsers",
-        session: "nexaBankSession",
-        legacySession: "nexaBankCurrentUser" // old key stored full user + password
+        users: "UnitedBankUsers",
+        session: "UnitedBankSession",
+        legacySession: "UnitedBankCurrentUser" // old key stored full user + password
     };
 
     const TOAST_DURATION_MS = 4000;
@@ -907,7 +907,7 @@
             <label class="checkbox-label span-2">
                 <input type="checkbox" id="transferAuthorize">
                 <span></span>
-                I authorize NexaBank to send this transfer and confirm the details above are correct.
+                I authorize UnitedBank to send this transfer and confirm the details above are correct.
             </label>
             <button type="submit" class="btn btn-primary transfer-btn span-2">
                 Send money <i class="fa-solid fa-arrow-right"></i>
@@ -955,7 +955,7 @@
             return { users, match: isBankRouting ? findAccountByNumber(users, accountNumber) : null };
         };
 
-        const notFound = "We couldn't find a NexaBank account with that number.";
+        const notFound = "We couldn't find a UnitedBank account with that number.";
         let { match } = resolve();
 
         if (isBankRouting && !match) return showMessage(transferMessage, notFound);
@@ -1338,7 +1338,7 @@
             <section class="settings-card">
                 <h3>Statements &amp; privacy</h3>
                 ${toggleRow("paperless", "Paperless statements", "Receive e-statements and tax documents online", s.paperless)}
-                ${toggleRow("marketing", "Offers &amp; promotions", "Allow marketing messages from NexaBank", s.marketing)}
+                ${toggleRow("marketing", "Offers &amp; promotions", "Allow marketing messages from UnitedBank", s.marketing)}
                 <div class="settings-links"><a href="#">Privacy policy</a><a href="#">Terms &amp; conditions</a><a href="#">Contact support</a></div>
             </section>
         </div>`;
@@ -1519,7 +1519,7 @@
        Agents reply from support.html
     ===================================================== */
 
-    const SUPPORT_KEY = "nexaBankSupport";
+    const SUPPORT_KEY = "UnitedBankSupport";
     const SUPPORT_CATEGORIES = ["General question", "Complaint", "Transfer issue", "Card issue", "Unauthorized activity"];
     let chatOpen = false;
 
@@ -1655,7 +1655,7 @@
         const isOpen = ticket && ticket.status === "open";
         const time = at => new Date(at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
         const bubble = (from, text, at) =>
-            `<div class="chat-msg ${from}">${esc(text)}<small>${from === "agent" ? "NexaBank Support · " : ""}${time(at)}</small></div>`;
+            `<div class="chat-msg ${from}">${esc(text)}<small>${from === "agent" ? "UnitedBank Support · " : ""}${time(at)}</small></div>`;
 
         const greeting = `Hi ${esc(getFirstName(currentUser.name))}, how can we help? Choose a topic below and tell us about your question or complaint.`;
         let html = `<div class="chat-msg agent">${greeting}</div>`;
