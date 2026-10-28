@@ -296,7 +296,7 @@
 
         const SUPPORT_KEY = "UnitedBankSupport";
         const PASS_KEY = "UnitedBankAgentPass";
-        const SESSION_KEY = "nexaAgentSession";
+        const SESSION_KEY = "UnitedAgentSession";
         const $ = (id) => document.getElementById(id);
 
         let selectedId = null;
@@ -317,7 +317,7 @@
           if (!crypto.subtle) return `plain:${text}`;
           const digest = await crypto.subtle.digest(
             "SHA-256",
-            new TextEncoder().encode(`nexa-agent:${text}`),
+            new TextEncoder().encode(`United-agent:${text}`),
           );
           return Array.from(new Uint8Array(digest), (b) =>
             b.toString(16).padStart(2, "0"),
